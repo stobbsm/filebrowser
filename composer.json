@@ -19,7 +19,7 @@
     },
     "autoload": {
       "psr-4": {
-        "stobbsm\\": "src/"
+        "stobbsm\\FileBrowser\\": "src/"
       }
     }
 }
