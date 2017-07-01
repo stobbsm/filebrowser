@@ -1,0 +1,17 @@
+{
+    "name": "stobbsm/filebrowser",
+    "description": "Search a given directory path and return an array containing the data.",
+    "type": "library",
+    "license": "GPLv3",
+    "authors": [
+        {
+            "name": "Matthew Stobbs",
+            "email": "matthew@sproutingcommuniations.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "require-dev": {
+        "phpunit/phpunit": "^6.3@dev"
+    }
+}
