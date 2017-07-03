@@ -110,6 +110,10 @@ class FileBrowser {
    * @method Search
    * @param  string $key   Key to base search on
    * @param  string $value Value to find. Can be * as a wildcard.
+   * @param  boolean $recursive Search recursively
+   * @param  array $subarr A sub array to search through, meant to be used when you don't want to search all files.
+   *
+   * @return array The found files
    */
   public function Search(string $key, string $value, bool $recursive = true, array $subarr = null) {
     $found = [];
@@ -134,6 +138,30 @@ class FileBrowser {
       }
     }
     return $found;
+  }
+
+  /**
+   * Search for many values based on a single key in the file array
+   * @method SearchMany
+   * @param  string     $key       The key to search for
+   * @param  array      $values    An array of values to search
+   * @param  boolean    $recursive Search recursively
+   *
+   * @return array The found files
+   */
+  public function SearchMany(string $key, array $values, bool $recursive = true) {
+    $found = [];
+    foreach($values as $value) {
+      $_currentValue = $this->Search($key, $value, $recursive);
+      foreach($_currentValue as $_current) {
+        array_push($found, $_current);
+      }
+    }
+    if(count($found) == 0) {
+      return false;
+    } else {
+      return $found;
+    }
   }
 
   /**
