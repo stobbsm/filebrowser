@@ -24,4 +24,4 @@ use stobbsm\FileBrowser\FileBrowser;
 
 $myfiles = new FileBrowser('/home/stobbsm/Pictures');
 
-print_r($myfiles);
+print_r($myfiles->Search('mimetype', 'image/jpeg')->Flatten(false)->get());

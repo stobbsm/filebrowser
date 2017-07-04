@@ -29,7 +29,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  */
 class FileBrowser {
 
-  private $files = array();
+  private $files = null; // Used during processing.
+  private $_files = array(); // Stored as original
   private $basepath = "";
 
   const DIRECTORY = 'directory';
@@ -42,8 +43,10 @@ class FileBrowser {
    * @param  string      $path Base path to start searching
    */
   public function __construct(string $path) {
+    printf("Constructing FileBrowser object\n");
     $this->basepath=$path;
-    $this->files=$this->buildFiles();
+    $this->_files=$this->buildFiles();
+    $this->reset();
   }
 
   /**
@@ -99,9 +102,9 @@ class FileBrowser {
    */
   public function dump(bool $rstring = false) {
     if($rstring) {
-      return print_r($this->files, true);
+      return print_r($this->getFiles(), true);
     } else {
-      print_r($this->files);
+      print_r($this->getFiles());
     }
   }
 
@@ -111,21 +114,20 @@ class FileBrowser {
    * @param  string $key   Key to base search on
    * @param  string $value Value to find. Can be * as a wildcard.
    * @param  boolean $recursive Search recursively
-   * @param  array $subarr A sub array to search through, meant to be used when you don't want to search all files.
    *
-   * @return array The found files
+   * @return FileBrowser    The current filebrowser object
    */
-  public function Search(string $key, string $value, bool $recursive = true, array $subarr = null) {
+  public function Search(string $key, string $value, bool $recursive = true) {
+    $this->files = $this->dosearch($key, $value, $recursive, $this->getFiles());
+    return $this;
+  }
+
+  public function dosearch(string $key, string $value, bool $recursive, array $searcharray) {
     $found = [];
-    if(isset($subarr)) {
-      $searcharray = $subarr;
-    } else {
-      $searcharray = $this->files;
-    }
     foreach($searcharray as $file) {
       $_current = $file;
       if($_current['type'] === FileBrowser::DIRECTORY && $recursive = true) {
-        $_current['contents'] = $this->Search($key, $value, $recursive, $file['contents']);
+        $_current['contents'] = $this->dosearch($key, $value, $recursive, $file['contents']);
         if(isset($_current['contents'])) {
           array_push($found, $_current);
         }
@@ -152,7 +154,7 @@ class FileBrowser {
   public function SearchMany(string $key, array $values, bool $recursive = true) {
     $found = [];
     foreach($values as $value) {
-      $_currentValue = $this->Search($key, $value, $recursive);
+      $_currentValue = $this->dosearch($key, $value, $recursive, $this->getFiles());
       foreach($_currentValue as $_current) {
         array_push($found, $_current);
       }
@@ -160,7 +162,8 @@ class FileBrowser {
     if(count($found) == 0) {
       return false;
     } else {
-      return $found;
+      $this->files = $found;
+      return $this;
     }
   }
 
@@ -169,15 +172,25 @@ class FileBrowser {
    * @method Flatten
    * @param  bool   $includedirs If true, include directories in the flattened array.
    * @param  array  $toflatten The array to flatten. If not set, uses the file map.
+   * @return FileBrowser       The current FileBrowser object with modifications done.
    */
   public function Flatten(bool $includedirs = true, array $toflatten = null) {
-    if(!isset($toflatten)) {
-      $toflatten = $this->files;
-    }
+    $this->files = $this->flattenit($includedirs, $this->getFiles());
+    return $this;
+  }
+
+  /**
+   * Private function that actually does the array flattening and state storage.
+   * @method flattenit
+   * @param  bool      $includedirs If true, include directories in the flattened array.
+   * @param  array     $toflatten   Multi-dimensional array to flatten.
+   * @return array                  The flattened array.
+   */
+  private function flattenit(bool $includedirs, array $toflatten) {
     $flattened = [];
     foreach($toflatten as $item) {
       if($item['type'] === FileBrowser::DIRECTORY) {
-        $_flat = $this->Flatten($includedirs, $item['contents']);
+        $_flat = $this->flattenit($includedirs, $item['contents']);
         foreach($_flat as $_item) {
           array_push($flattened, $_item);
         }
@@ -191,5 +204,37 @@ class FileBrowser {
       }
     }
     return $flattened;
+  }
+
+  /**
+   * Return the file array. Resets the files array after use.
+   * @method get
+   *
+   * @return array Array of files found.
+   */
+  public function get() {
+    $toreturn = $this->getFiles();
+    $this->reset();
+    return $toreturn;
+  }
+
+  /**
+   * Set keep the backup copy of files fresh when needed.
+   * @method getFiles
+   * @return array The files array.
+   */
+  private function getFiles() {
+    if(!isset($this->files) && !is_array($this->files)) {
+      $this->files = $this->_files;
+    }
+    return $this->files;
+  }
+
+  /**
+   * Reset the files array to the initial value.
+   * @method reset
+   */
+  private function reset() {
+    $this->files = null;
   }
 }
