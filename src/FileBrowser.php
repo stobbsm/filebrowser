@@ -43,7 +43,6 @@ class FileBrowser {
    * @param  string      $path Base path to start searching
    */
   public function __construct(string $path) {
-    printf("Constructing FileBrowser object\n");
     $this->basepath=$path;
     $this->_files=$this->buildFiles();
     $this->reset();
