@@ -54,12 +54,12 @@ class File
 
         if (is_link($this->full_path)) {
             $this->handle_type = File::LINK;
+        } elseif (is_dir($this->full_path)) {
+            $this->handle_type = File::DIRECTORY;
         } elseif (is_executable($this->full_path)) {
             $this->handle_type = File::EXEC;
         } elseif (is_file($this->full_path)) {
             $this->handle_type = File::FILE;
-        } elseif (is_dir($this->full_path)) {
-            $this->handle_type = File::DIRECTORY;
         } else {
             $this->handle_type = File::UNKNOWN;
         }

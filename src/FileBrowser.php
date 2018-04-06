@@ -73,20 +73,22 @@ class FileBrowser
         }
         
         $path = rtrim($path, '/');
+        printf("Staring in path: %s\n", $path);
         
         // Scandir, then loop through it to find the contents of sub directories as well.
         // Remove single and double dot directories from Unix like system listings
         $contents = array_diff(scandir($path), ['.', '..']);
         foreach ($contents as $key => $pathname) {
-            $full_path = rtrim($this->basepath, '/') . '/' . basename($pathname);
+            $full_path = rtrim($path, '/') . '/' . basename($pathname);
             $file = new File($full_path);
             if ($file->handle_type == 'directory') {
-                array_push($this->file_index, $this->buildFiles($file->full_path));
-            } else {
-                array_push($this->file_index, $file);
+                printf("Found directory: %s\n", $file->full_path);
+                array_push($builtPath, $this->buildFiles($file->full_path));
             }
+            array_push($builtPath, $file);
         }
-        return $this->file_index;
+        $this->file_index = $builtPath;
+        return $builtPath;
     }
     
     /**

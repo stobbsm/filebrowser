@@ -35,7 +35,8 @@ $myfiles = new FileBrowser('/home/stobbsm/Nextcloud');
 $end_time = getrusage();
 
 // Script end
-function rutime($ru, $rus, $index) {
+function rutime($ru, $rus, $index)
+{
     return ($ru["ru_$index.tv_sec"]*1000 + intval($ru["ru_$index.tv_usec"]/1000))
      -  ($rus["ru_$index.tv_sec"]*1000 + intval($rus["ru_$index.tv_usec"]/1000));
 }
@@ -44,3 +45,5 @@ echo "This process used " . rutime($end_time, $start_time, "utime") .
     " ms for its computations\n";
 echo "It spent " . rutime($end_time, $start_time, "stime") .
     " ms in system calls\n";
+
+$myfiles->dump();
