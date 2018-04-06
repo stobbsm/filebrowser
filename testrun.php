@@ -18,10 +18,29 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 
-require 'src/FileBrowser.php';
+require 'vendor/autoload.php';
 
-use stobbsm\FileBrowser\FileBrowser;
+use stobbsm\FileBrowser;
 
-$myfiles = new FileBrowser('/home/stobbsm/Pictures');
+$start_time = getrusage();
 
-print_r($myfiles->Search('mimetype', 'image/jpeg')->Flatten(false)->get());
+if (extension_loaded('pthreads')) {
+    printf("Extenstion pthreads is loaded\n");
+} else {
+    printf("Extension pthreads is not loaded\n");
+}
+
+$myfiles = new FileBrowser('/home/stobbsm/Nextcloud');
+
+$end_time = getrusage();
+
+// Script end
+function rutime($ru, $rus, $index) {
+    return ($ru["ru_$index.tv_sec"]*1000 + intval($ru["ru_$index.tv_usec"]/1000))
+     -  ($rus["ru_$index.tv_sec"]*1000 + intval($rus["ru_$index.tv_usec"]/1000));
+}
+
+echo "This process used " . rutime($end_time, $start_time, "utime") .
+    " ms for its computations\n";
+echo "It spent " . rutime($end_time, $start_time, "stime") .
+    " ms in system calls\n";

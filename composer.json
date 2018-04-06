@@ -12,12 +12,14 @@
     ],
     "minimum-stability": "dev",
     "require": {
-      "php": "^7.0"
+      "php": "^7.1"
     },
     "require-dev": {
         "phpunit/phpunit": "^6.3@dev"
     },
     "autoload": {
-      "files": ["src/FileBrowser.php"]
+        "psr-4": {
+            "stobbsm\\": "src/"
+        }
     }
 }
